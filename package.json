@@ -1,0 +1,25 @@
+{
+  "name": "vite-sandbox",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.41",
+    "vue-router": "^4.1.6",
+    "vuetify": "^3.0.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "autoprefixer": "^10.4.13",
+    "normalize.css": "^8.0.1",
+    "postcss": "^8.4.20",
+    "postcss-cli": "^10.1.0",
+    "sass": "^1.56.1",
+    "vite": "^4.0.0"
+  }
+}
