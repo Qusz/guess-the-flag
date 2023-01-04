@@ -1,12 +1,14 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { fileURLToPath, URL } from "url"
-import autoprefixer from 'autoprefixer'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from "url";
+import autoprefixer from 'autoprefixer';
+import vuetify from 'vite-plugin-vuetify';
 
 
 export default defineConfig({
   plugins: [
-    vue()
+    vue(),
+    vuetify()
   ],
   resolve: {
     alias: {
