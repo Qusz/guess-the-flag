@@ -8,9 +8,7 @@ import GameView from '../components/GameView.vue';
 
 
 export default {
-
   components: { GameView },
-
   setup() {
 
   }

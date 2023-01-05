@@ -29,16 +29,17 @@
 </template>
 
 <script>
-export default {
 
-  data() {
+import { ref } from 'vue';
+
+export default {
+  setup() {
+    const drawer = ref(false);
+
     return {
-      drawer: false
+      drawer
     }
   }
-
-
-  
 }
 </script>
 
