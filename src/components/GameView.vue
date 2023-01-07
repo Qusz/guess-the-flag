@@ -3,23 +3,25 @@
     <v-sheet class="pa-5 mt-5 mx-auto elevation-5 rounded" max-width="800">
 
       <v-sheet 
-        v-if="states.play.value" 
+        v-if="states.play.value && data" 
         class="play mx-auto"
       >
         <v-img
           class="elevation-3 mx-auto"
           max-width="320"
-          src="/flag-placeholder.png"
+          :src="flagURL"
         ></v-img>
         <v-row class="text-center mt-12">
           <v-col
-            v-for="(item, index) in testArray" :key="index" 
+            v-for="(item, index) in options" :key="index" 
+            @click.stop="answer"
+            :data-country="item.code"
             cols="12" sm="6"
           >
-            <v-btn 
+            <v-btn
               class="bg-blue-darken-2 w-100 text-capitalize"
             >
-              {{ item }}
+              {{ item.name }}
             </v-btn>
           </v-col>
         </v-row>
@@ -47,13 +49,16 @@
         v-if="states.defeat.value"
       >
         <h2>
-          You lose!
+          Uh oh! You lose :(
         </h2>
+        <p>
+          Total flags guessed: {{ countriesGuessed }}
+        </p>
         <v-btn 
           class="bg-blue-darken-2 w-25 mt-6"
           @click="this.startGame"
         >
-          I can try!
+          Play again
         </v-btn>
       </v-sheet>
 
@@ -63,13 +68,13 @@
         v-if="states.victory.value"
       >
         <h2>
-          You win!
+          We salute you! You have guessed all the flags. 
         </h2>
         <v-btn 
           class="bg-blue-darken-2 w-25 mt-6"
           @click="this.startGame"
         >
-          I can try!
+          Play again
         </v-btn>
       </v-sheet>
 
@@ -80,10 +85,15 @@
 
 <script>
 
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import getCountries from '@/API/countries.js';
 
 export default {
   setup() {
+    onMounted(() => {
+      getData();
+    });
+    
     const states = {
       intro: ref(true),
       play: ref(false),
@@ -91,30 +101,109 @@ export default {
       victory: ref(false)
     }
 
-    const testArray = [1,2,3,4];
+    const data = ref(null);
+    const correctAnswer = ref(null);
+    const flagURL = ref(null);
+    const options = ref([]);
+    const countriesGuessed = ref(0);
 
-    let correctAnswer = null;
-    const options = [];
+    let usedCountries = [];
+    let currentCountryIndex = null;
+
+    const getData = async () => {
+      const response = await getCountries();
+      const sortedResponse = [];
+
+      // Independent nations only
+      response.forEach(item => {
+        if (item.independent === true) {
+          sortedResponse.push(item);
+        }
+      })
+
+      data.value = sortedResponse;
+    }
+
+    const randomIndex = () => {
+      if (!data && !data.value) return;
+      return Math.floor(Math.random() * data.value.length);
+    }
     
+    const pickCountry = () => {
+      const index = randomIndex();
+
+      if (usedCountries.includes(index)) {
+        pickCountry();
+        return;
+      } 
+
+      const currentCountryData = data.value[index];
+
+      currentCountryIndex = index;
+      usedCountries.push(index);
+
+      options.value.push({
+        name: currentCountryData.name.common,
+        code: currentCountryData.ccn3
+      });
+
+      correctAnswer.value = currentCountryData.ccn3;
+      flagURL.value = currentCountryData.flags.png; 
+
+    }
+
+    const pickWrongAnswers = () => {
+      const pickedCountries = [];
+
+      while (pickedCountries.length < 3) {
+        const countryIndex = randomIndex();
+
+        switch(true) {
+          case pickedCountries.includes(countryIndex):
+          case countryIndex === currentCountryIndex:
+            break;
+          default:
+            pickedCountries.push(countryIndex);
+        }
+      }
+      
+      pickedCountries.forEach(item => {
+        options.value.push({
+          name: data.value[item].name.common,
+          code: data.value[item].ccn3
+        });
+      });
+    }
+
+
+    const clearOptions = () => {
+      options.value = [];
+    }
 
     const answer = (e) => {
-      if (e.target.value === correctAnswer) {
-
+      if (e.currentTarget.dataset.country === correctAnswer.value) {
+        countriesGuessed.value++;
+        nextQuestion();
       } else {
         youLose();
       }
     }
 
-    const testMethod = (e) => {
-      console.log(e.target.innerText);
-    }
 
 
-    const newQuestion = () => {
-      
+
+    const nextQuestion = () => {
+      clearOptions();
+      if (data.value.length === usedCountries.length) youWin();
+
+      pickCountry();
+      pickWrongAnswers();
+      shuffleArray(options.value);
     }
 
     const startGame = () => {
+      countriesGuessed.value = 0;
+  
       for (const state in states) {
         if (state !== 'play') {
           states[state].value = false;
@@ -122,18 +211,36 @@ export default {
       }
 
       states.play.value = true;
+      nextQuestion();
     }
 
     const youLose = () => {
+      clearCountries();
+
       states.play.value = false;
       states.defeat.value = true;
     }
 
     const youWin = () => {
+      clearCountries();
+
       states.play.value = false;
       states.victory.value = true;
     }
 
+    const clearCountries = () => {
+      usedCountries = [];
+    }
+
+    const shuffleArray = (array) => {
+      for (let i = 0; i < array.length; i++) {
+        const randomIndex = Math.floor(Math.random() * array.length);
+
+        [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
+      }
+
+      return array;
+    };
 
 
     return {
@@ -141,8 +248,11 @@ export default {
       startGame,
       youLose,
       youWin,
-      testArray,
-      testMethod
+      data,
+      options,
+      answer,
+      flagURL,
+      countriesGuessed
     }
   }
 
