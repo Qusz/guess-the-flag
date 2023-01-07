@@ -49,7 +49,7 @@
         v-if="states.defeat.value"
       >
         <h2>
-          Uh oh! You lose :(
+          Uh oh! You lost :(
         </h2>
         <p>
           Total flags guessed: {{ countriesGuessed }}
@@ -68,7 +68,7 @@
         v-if="states.victory.value"
       >
         <h2>
-          We salute you! You have guessed all the flags. 
+          We salute you! You have guessed all {{ countriesGuessed }} flags. Amazing!
         </h2>
         <v-btn 
           class="bg-blue-darken-2 w-25 mt-6"
@@ -87,6 +87,7 @@
 
 import { onMounted, ref } from 'vue';
 import getCountries from '@/API/countries.js';
+import { clearArray, randomIndex, shuffleArray } from '@/helpers/helpers.js';
 
 export default {
   setup() {
@@ -124,13 +125,8 @@ export default {
       data.value = sortedResponse;
     }
 
-    const randomIndex = () => {
-      if (!data && !data.value) return;
-      return Math.floor(Math.random() * data.value.length);
-    }
-    
     const pickCountry = () => {
-      const index = randomIndex();
+      const index = randomIndex(data.value);
 
       if (usedCountries.includes(index)) {
         pickCountry();
@@ -149,14 +145,13 @@ export default {
 
       correctAnswer.value = currentCountryData.ccn3;
       flagURL.value = currentCountryData.flags.png; 
-
     }
 
     const pickWrongAnswers = () => {
       const pickedCountries = [];
 
       while (pickedCountries.length < 3) {
-        const countryIndex = randomIndex();
+        const countryIndex = randomIndex(data.value);
 
         switch(true) {
           case pickedCountries.includes(countryIndex):
@@ -176,10 +171,6 @@ export default {
     }
 
 
-    const clearOptions = () => {
-      options.value = [];
-    }
-
     const answer = (e) => {
       if (e.currentTarget.dataset.country === correctAnswer.value) {
         countriesGuessed.value++;
@@ -193,7 +184,7 @@ export default {
 
 
     const nextQuestion = () => {
-      clearOptions();
+      clearArray(options.value);
       if (data.value.length === usedCountries.length) youWin();
 
       pickCountry();
@@ -215,32 +206,19 @@ export default {
     }
 
     const youLose = () => {
-      clearCountries();
+      clearArray(usedCountries);
 
       states.play.value = false;
       states.defeat.value = true;
     }
 
     const youWin = () => {
-      clearCountries();
+      clearArray(usedCountries);
 
       states.play.value = false;
       states.victory.value = true;
     }
 
-    const clearCountries = () => {
-      usedCountries = [];
-    }
-
-    const shuffleArray = (array) => {
-      for (let i = 0; i < array.length; i++) {
-        const randomIndex = Math.floor(Math.random() * array.length);
-
-        [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
-      }
-
-      return array;
-    };
 
 
     return {
