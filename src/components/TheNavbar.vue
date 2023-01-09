@@ -4,7 +4,7 @@
     class="text-center"
   >
     <v-app-bar-title class="text-md-h5 font-weight-bold">
-      The Flags
+      Guess The Flag
     </v-app-bar-title>
   </v-app-bar>
 </template>
