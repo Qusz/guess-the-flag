@@ -4,17 +4,11 @@
 
 <script>
 
-import GameView from '../components/GameView.vue';
-
+import GameView from '@/components/GameView.vue';
 
 export default {
-  components: { GameView },
-  setup() {
-
-  }
+  components: { GameView }
 }
 </script>
 
-<style scoped lang="scss">
-  @use '@/styles/views/home.scss';
-</style>
+<style></style>
