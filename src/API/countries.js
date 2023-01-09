@@ -3,13 +3,13 @@ export default async function getCountries() {
     const response = await fetch('https://restcountries.com/v3.1/all');
 
     if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      throw new Error(`Can't load data... ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json()
     return data;
 
   } catch (error) {
-    return error;
+    throw new Error(error);
   }
 }
