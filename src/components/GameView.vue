@@ -253,7 +253,7 @@ export default {
         countriesGuessed.value++;
         states.correct.value = true;
 
-        setTimeout(nextQuestion, 1200);
+        setTimeout(nextQuestion, 1000);
       } else {
         youLose();
       }
