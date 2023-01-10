@@ -14,7 +14,7 @@
       min-height="200"
       v-if="states.intro.value"
     >
-      <h2>
+      <h2 class="text-center">
         Can you guess every single flag in the world?
       </h2>
       <v-btn 
