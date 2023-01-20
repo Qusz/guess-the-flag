@@ -27,7 +27,7 @@
 
     <v-sheet 
       v-if="states.play.value && data" 
-      :class="[styles.cardClasses, 'play']"
+      :class="[styles.cardClasses, 'play', 'px-2']"
     >
       <v-img
         :src="flagURL"
@@ -44,7 +44,9 @@
           cols="12" sm="6"
           @click="answer"
         >
-          <v-btn :class="styles.otpionButton">
+          <v-btn 
+            :class="[styles.otpionButton, 'text-caption text-sm-button']"
+          >
             {{ item.name }}
           </v-btn>
         </v-col>
